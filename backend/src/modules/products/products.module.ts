@@ -5,7 +5,6 @@ import { ListProductsUseCase } from './application/use-cases/list-products/list-
 import { PRODUCT_REPOSITORY } from './domain/repositories/product.repository.interface';
 import { ProductPrismaRepository } from './infrastructure/prisma/product.prisma.repository';
 
-
 @Module({
   controllers: [
     ProductsController,
