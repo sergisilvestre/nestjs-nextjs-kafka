@@ -1,12 +1,16 @@
-import { Controller, Get } from '@nestjs/common';
-import { AppService } from './app.service';
+import { Controller, Get, Header } from '@nestjs/common';
+import { ApiExcludeController } from '@nestjs/swagger';
 
+@ApiExcludeController()
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
-
   @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  @Header('Content-Type', 'text/html')
+  getRoot() {
+    return `
+      <h2>Real-Time Order Tracking API</h2>
+      <p>Backend is running successfully.</p>
+      <p><a href="/docs">📚 Open Swagger Documentation</a></p>
+    `;
   }
 }

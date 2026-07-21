@@ -49,7 +49,6 @@ Architecture.
 
 ### Next.js
 
--   Login/Register
 -   Menu & checkout
 -   Order history
 -   Live order status via WebSockets
@@ -58,7 +57,6 @@ Architecture.
 ### NestJS
 
 -   REST endpoints
--   Authentication
 -   Validation
 -   Publish Kafka events
 -   Receive events
@@ -83,7 +81,6 @@ Architecture.
 
 ### PostgreSQL
 
--   Users
 -   Orders
 -   Products
 -   Payments
@@ -120,7 +117,6 @@ Infrastructure
 
 ### Phase 2
 
--   [ ] Product CRUD
 -   [ ] Create Order
 -   [ ] Order History
 -   [ ] Validation

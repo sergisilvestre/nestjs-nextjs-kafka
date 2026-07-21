@@ -95,19 +95,6 @@ As WebSocket messages arrive, the UI updates automatically.
 
 ---
 
-# Backend
-
-### Product CRUD
-
-```
-GET /products
-
-POST /products
-
-```
-
----
-
 ### Orders
 
 ```

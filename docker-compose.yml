@@ -66,10 +66,9 @@ services:
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       JWT_SECRET: ${JWT_SECRET}
       KAFKA_BROKER: kafka:9092
-
-      # Nest watcher
       CHOKIDAR_USEPOLLING: "true"
-      WATCHPACK_POLLING: "true"
+      CHOKIDAR_INTERVAL: "1000"
+      TSC_WATCHFILE: DynamicPriorityPolling
 
     volumes:
       - ./backend:/app
