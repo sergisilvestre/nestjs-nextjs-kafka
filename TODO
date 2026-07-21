@@ -104,9 +104,6 @@ GET /products
 
 POST /products
 
-PATCH /products/:id
-
-DELETE /products/:id
 ```
 
 ---
