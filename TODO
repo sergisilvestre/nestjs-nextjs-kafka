@@ -1,0 +1,356 @@
+For this stack, I'd keep the MVP very small while still exercising **every technology**.
+
+## MVP: Pizza Order Tracking
+
+The user doesn't log in. They simply place an order and watch it progress in real time.
+
+### Workflow
+
+```text
+Customer
+    │
+    ▼
+Choose Products
+    │
+    ▼
+Create Order
+    │
+    ▼
+PENDING
+    │
+    ▼
+PREPARING
+    │
+    ▼
+READY
+    │
+    ▼
+OUT_FOR_DELIVERY
+    │
+    ▼
+DELIVERED
+```
+
+Every status change:
+
+* Updates PostgreSQL
+* Publishes a Kafka event
+* Is consumed by the Notification Service
+* Sends a WebSocket update to the browser
+
+This demonstrates the complete event-driven architecture.
+
+---
+
+# Frontend (Next.js)
+
+### Products Page
+
+```
+🍕 Margherita
+€12
+
+🍔 Burger
+€10
+
+🥤 Cola
+€3
+
+[Add]
+```
+
+---
+
+### Cart
+
+```
+Margherita x2
+
+Cola x1
+
+Total €27
+
+[Place Order]
+```
+
+---
+
+### Order Tracking
+
+```
+Order #42
+
+🟢 Pending
+
+⬜ Preparing
+
+⬜ Ready
+
+⬜ Delivery
+
+⬜ Delivered
+```
+
+As WebSocket messages arrive, the UI updates automatically.
+
+---
+
+# Backend
+
+### Product CRUD
+
+```
+GET /products
+
+POST /products
+
+PATCH /products/:id
+
+DELETE /products/:id
+```
+
+---
+
+### Orders
+
+```
+POST /orders
+
+GET /orders
+
+GET /orders/:id
+
+PATCH /orders/:id/status
+```
+
+---
+
+# Kafka
+
+## Producer
+
+After creating an order:
+
+```
+POST /orders
+
+↓
+
+Kafka
+
+↓
+
+order.created
+```
+
+---
+
+## Kitchen Service
+
+Consumes
+
+```
+order.created
+```
+
+Produces
+
+```
+order.preparing
+```
+
+Later
+
+```
+order.ready
+```
+
+---
+
+## Delivery Service
+
+Consumes
+
+```
+order.ready
+```
+
+Produces
+
+```
+delivery.started
+
+order.delivered
+```
+
+---
+
+## Notification Service
+
+Consumes every event.
+
+```
+order.created
+
+order.preparing
+
+order.ready
+
+delivery.started
+
+order.delivered
+```
+
+Then
+
+```
+WebSocket
+
+↓
+
+Browser
+```
+
+---
+
+# WebSocket
+
+Frontend subscribes:
+
+```
+order:update
+```
+
+Receives:
+
+```json
+{
+  "orderId": 42,
+  "status": "READY"
+}
+```
+
+The UI updates instantly without refreshing.
+
+---
+
+# PostgreSQL
+
+Just three tables are enough:
+
+```
+products
+
+orders
+
+order_items
+```
+
+No users.
+
+No authentication.
+
+No payments.
+
+---
+
+# Docker
+
+Containers:
+
+```
+Next.js
+
+NestJS
+
+PostgreSQL
+
+Kafka
+
+Kafka UI
+
+Zookeeper (or KRaft mode)
+
+```
+
+---
+
+# Kubernetes
+
+Deploy:
+
+```
+frontend
+
+gateway
+
+postgres
+
+kafka
+
+notification-service
+```
+
+Even if some services are initially just placeholders, you'll demonstrate deployments, services, ConfigMaps, Secrets, and scaling.
+
+---
+
+# Testing
+
+### Unit
+
+* Product entity
+* Order entity
+* CreateOrder use case
+* ChangeOrderStatus use case
+
+### Integration
+
+```
+POST /products
+
+POST /orders
+
+PATCH /orders/:id/status
+```
+
+### E2E
+
+```
+Create order
+
+↓
+
+Kafka
+
+↓
+
+Notification
+
+↓
+
+WebSocket
+
+↓
+
+Browser updates
+```
+
+---
+
+# 5-Minute Demo
+
+This sequence shows every major technology:
+
+1. Open the frontend.
+2. Create a few products.
+3. Place an order.
+4. Show the order saved in PostgreSQL.
+5. Show the `order.created` event in Kafka UI.
+6. Simulate the Kitchen Service changing the status.
+7. Show new Kafka events being published.
+8. Watch the frontend update live via WebSockets.
+9. Run the Jest test suite.
+10. Show the application running in Docker, then in Kubernetes.
+
+This MVP is intentionally small but highlights the technologies you want to showcase: **Next.js, NestJS, Prisma, PostgreSQL, Kafka, WebSockets, Docker, Kubernetes, Jest, Supertest, Clean Architecture, TDD, and CI/CD**, without spending time on features like authentication or payments that don't reinforce the project's core objective.
